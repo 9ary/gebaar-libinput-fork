@@ -30,6 +30,8 @@ gebaar::io::Input::Input(
   config = config_ptr;
   gesture_swipe_event = {};
 
+  pen_button_event = {};
+
   gesture_pinch_event = {};
   gesture_pinch_event.scale = DEFAULT_SCALE;
 }
@@ -60,6 +62,13 @@ void gebaar::io::Input::reset_pinch_event() {
   gesture_pinch_event = {};
   gesture_pinch_event.scale = DEFAULT_SCALE;
   gesture_pinch_event.executed = false;
+}
+
+/**
+ * Reset pen button event struct to defaults
+ */
+void gebaar::io::Input::reset_pen_button_event() {
+  pen_button_event = {};
 }
 
 /**
@@ -150,6 +159,30 @@ void gebaar::io::Input::handle_swipe_event_without_coords(
 }
 
 /**
+ * This event has no coordinates, so it's an event that gives us a begin or end
+ * signal. If it begins, we get the amount of fingers used. If it ends, we check
+ * what kind of gesture we received.
+ *
+ * @param gev Gesture Event
+ * @param begin Boolean to denote begin or end of gesture
+ */
+void gebaar::io::Input::handle_pen_button_event_without_coords(
+    libinput_event_tablet_tool *ttev) {
+    pen_button_event.state = libinput_event_tablet_tool_get_button_state(ttev);
+
+    if (config->settings.pen_button_trigger_on_release) {
+        if (pen_button_event.state == LIBINPUT_BUTTON_STATE_RELEASED) {
+          trigger_pen_button_command();
+        }
+    } else {
+        if (pen_button_event.state == LIBINPUT_BUTTON_STATE_PRESSED) {
+          trigger_pen_button_command();
+        }
+    }
+    reset_pen_button_event();
+}
+
+/**
  * Swipe events with coordinates, add it to the current tally
  * @param gev Gesture Event
  */
@@ -212,6 +245,13 @@ void gebaar::io::Input::trigger_swipe_command() {
   }
 }
 
+/**
+ * Making calculation for swipe direction and triggering
+ * command accordingly
+ */
+void gebaar::io::Input::trigger_pen_button_command() {
+  std::system(config->pen_button_commands.c_str());
+}
 /**
  * Initialize the input system
  * @return bool
@@ -320,6 +360,9 @@ void gebaar::io::Input::handle_event() {
     case LIBINPUT_EVENT_TABLET_TOOL_TIP:
       break;
     case LIBINPUT_EVENT_TABLET_TOOL_BUTTON:
+      handle_pen_button_event_without_coords(
+          libinput_event_get_tablet_tool_event(libinput_event));
+
       break;
     case LIBINPUT_EVENT_TABLET_PAD_BUTTON:
       break;

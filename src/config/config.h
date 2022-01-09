@@ -41,12 +41,14 @@ namespace gebaar::config {
           bool swipe_one_shot;
           double swipe_threshold;
           bool swipe_trigger_on_release;
+          bool pen_button_trigger_on_release;
         } settings;
 
         enum pinch {PINCH_IN, PINCH_OUT};
         std::string swipe_three_commands[10];
         std::string swipe_four_commands[10];
         std::string pinch_commands[10];
+        std::string pen_button_commands;
 
     private:
 
