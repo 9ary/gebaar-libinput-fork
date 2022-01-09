@@ -74,6 +74,9 @@ void gebaar::config::Config::load_config()
             settings.pinch_threshold = config->get_qualified_as<double>("pinch.settings.threshold").value_or(0.25);
             settings.pinch_one_shot = config->get_qualified_as<bool>("pinch.settings.one_shot").value_or(false);
 
+            /* pen button settings */
+            pen_button_commands = *config->get_qualified_as<std::string>("pen_button.commands.command");
+            settings.pen_button_trigger_on_release = config->get_qualified_as<bool>("pen_button.settings.trigger_on_release").value_or(true);
 
             loaded = true;
         }

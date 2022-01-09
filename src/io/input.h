@@ -47,6 +47,10 @@ namespace gebaar::io {
         int step;
     };
 
+    struct pen_button_event {
+        bool state;
+    };
+
     class Input {
     public:
         Input(std::shared_ptr<gebaar::config::Config> const& config_ptr);
@@ -66,6 +70,7 @@ namespace gebaar::io {
 
         struct gesture_swipe_event gesture_swipe_event;
         struct gesture_pinch_event gesture_pinch_event;
+        struct pen_button_event pen_button_event;
 
         bool initialize_context();
 
@@ -118,6 +123,13 @@ namespace gebaar::io {
         void handle_continouos_pinch(double new_scale);
 
         void handle_pinch_event(libinput_event_gesture* gev, bool begin);
+
+
+        void trigger_pen_button_command();
+
+        void handle_pen_button_event_without_coords(libinput_event_tablet_tool* ttev);
+
+        void reset_pen_button_event();
 
     };
 }
